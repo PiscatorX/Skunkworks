@@ -4,6 +4,7 @@ library(ggraph)
 library(igraph)
 library(readr)
 library(litsearchr)
+library(textstem)
 
 naive_results <- import_results(file="DATA/scopus_seagrass.ris")
 
@@ -43,8 +44,8 @@ ggraph(g, layout="stress") +
 strengths <- strength(g)
 
 term_strengths <- data.frame(term=names(strengths), strength=strengths, row.names=NULL) %>%
-                   mutate(rank=rank(strength, ties.method="min")) %>%
-                   arrange(strength) 
+                  arrange(desc(strength)) %>% mutate(rank=rank(-strength, ties.method="min"))
+                    
              
 
 term_strengths
@@ -64,7 +65,54 @@ cutoff_fig +
      geom_hline(yintercept=cutoff_cum, linetype="dashed")
 
 
-term_strengths %>%
+final_terms <- term_strengths %>%
                arrange(desc(strength)) %>%
                select(-rank) %>%
                filter(strength > cutoff_cum)
+
+final_terms
+
+
+get_keywords(reduce_graph(g, cutoff_cum))
+
+
+cutoff_change <- find_cutoff(g, method="changepoint", knot_num=3)
+
+cutoff_change
+
+
+stem_words(term_strengths$term) %>% unique() 
+
+
+
+cutoff_fig +
+       geom_hline(yintercept=cutoff_change, linetype="dashed")
+
+
+droplevels(final_terms$term)
+
+grouped_terms <-list(
+  gr1=final_terms$term[c(2, 3, 4)],
+  gr2=final_terms$term[c(1,5, 6, 7)],
+  gr3=final_terms$term[c(8:11)])
+
+grouped_terms
+
+
+
+levels(grouped_terms$gr2) <-c(levels(grouped_terms$other), "zostera")
+
+
+write_search(
+  grouped_terms,
+  languages="English",
+  exactphrase=TRUE,
+  stemming=TRUE,
+  closure="left",
+  writesearch=TRUE
+)
+
+cat(read_file("search-inEnglish.txt"))
+
+
+# ( seagrass  OR  "marine plant"  OR  "posidonia oceanica"  OR  "zostera marina"  OR  "cymodocea nodosa" )  AND  ( "transcriptom*"  OR  rna-seq )  OR  ( omics  OR  "simple sequence repeat" ) 
