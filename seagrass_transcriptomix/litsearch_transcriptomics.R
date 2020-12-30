@@ -91,16 +91,14 @@ cutoff_fig +
 
 droplevels(final_terms$term)
 
+#optional
+#Requires a bit of thought
 grouped_terms <-list(
   gr1=final_terms$term[c(2, 3, 4)],
   gr2=final_terms$term[c(1,5, 6, 7)],
   gr3=final_terms$term[c(8:11)])
 
 grouped_terms
-
-
-
-levels(grouped_terms$gr2) <-c(levels(grouped_terms$other), "zostera")
 
 
 write_search(
@@ -114,5 +112,5 @@ write_search(
 
 cat(read_file("search-inEnglish.txt"))
 
-
-# ( seagrass  OR  "marine plant"  OR  "posidonia oceanica"  OR  "zostera marina"  OR  "cymodocea nodosa" )  AND  ( "transcriptom*"  OR  rna-seq )  OR  ( omics  OR  "simple sequence repeat" ) 
+#Used custom query
+# (seagrass  OR  "marine plant"  OR  "posidonia oceanica"  OR  "zostera marina"  OR  "cymodocea nodosa" )  AND  ( "transcriptom*"  OR  rna-seq )  OR  ( omics  OR  "simple sequence repeat" ) 
