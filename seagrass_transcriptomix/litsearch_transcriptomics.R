@@ -1,3 +1,4 @@
+#https://luketudge.github.io/litsearchr-tutorial/litsearchr_tutorial.html
 library(dplyr)
 library(ggplot2)
 library(ggraph)
@@ -112,5 +113,19 @@ write_search(
 
 cat(read_file("search-inEnglish.txt"))
 
-#Used custom query
-# (seagrass  OR  "marine plant"  OR  "posidonia oceanica"  OR  "zostera marina"  OR  "cymodocea nodosa" )  AND  ( "transcriptom*"  OR  rna-seq )  OR  ( omics  OR  "simple sequence repeat" ) 
+#Used custom query using top "strength term"
+# (seagrass  OR  "marine plant"  OR  "posidonia oceanica"  OR  "zostera marina"  OR  "cymodocea nodosa" )  AND  ( "transcriptom*"  OR  rna-seq )  NOT  ("simple sequence repeat" ) 
+
+new_results <- import_results(file="DATA/scopus_seagrass_optimised.ris")
+
+nrow(naive_results)
+nrow(new_results)
+
+naive_results <- naive_results %>%
+                 mutate(in_new_results=title %in% new_results[, "title"]) ->
+  
+
+#Check if we missed any of the naive titles
+naive_results %>%
+   filter(!in_new_results) %>%
+   select(title, keywords)
