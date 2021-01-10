@@ -42,3 +42,21 @@ se <- summarizeOverlaps(features = ebg,
                         fragments = T)
                         
 
+
+se
+
+dim(se)
+
+assay(se)
+
+assayNames(se)
+
+colSums(assay(se))
+
+rowRanges(se)
+
+str(metadata(rowRanges(se)))
+
+colData(se)
+
+(colData(se) <- DataFrame(sample_table))
