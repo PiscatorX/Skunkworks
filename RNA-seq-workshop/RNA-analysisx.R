@@ -60,3 +60,11 @@ str(metadata(rowRanges(se)))
 colData(se)
 
 (colData(se) <- DataFrame(sample_table))
+
+se$dex
+
+
+se$cell
+
+#first level of a factor be the reference level 
+
