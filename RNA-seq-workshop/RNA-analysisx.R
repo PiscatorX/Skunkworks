@@ -2,8 +2,10 @@ library(GenomicAlignments)
 library(BiocParallel)
 library(GenomicFeatures)
 library(Rsamtools)
+library(DESeq2)
 library(airway)
 library(dplyr)
+
 
 
 register(SerialParam())
@@ -43,6 +45,11 @@ se <- summarizeOverlaps(features = ebg,
                         fragments = T)
                         
 
+############################################ FULL DATA #########################################################################
+data("airway")
+
+# SummarizedExperiment
+se <- airway
 
 se
 
@@ -56,7 +63,6 @@ colSums(assay(se))
 
 rowRanges(se)
 
-str(metadata(rowRanges(se)))
 
 colData(se)
 
@@ -71,5 +77,17 @@ se$cell
 
 se$dex <- relevel(se$dex, "untrt")
 
+
+round(colSums(assay(se)) / 1e6, 1 )
+
+str(metadata(rowRanges(se)))
+
+# count_data <- assay(se)
+# col_data <- colData(se)
+# (ddsMat <- DESeqDataSetFromMatrix(countData = count_data,
+#                                   colData = col_data,
+#                                   design = ~ cell + dex))
+
+dds <- DESeqDataSet(se, design = ~ cell + dex)
 
 
