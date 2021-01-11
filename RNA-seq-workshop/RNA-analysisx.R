@@ -8,6 +8,7 @@ library(dplyr)
 
 register(SerialParam())
 
+#This is toy data for test practise
 airway_dir  <- system.file("extdata", package = "airway", mustWork = T)
 
 list.files(airway_dir)
@@ -67,4 +68,8 @@ se$dex
 se$cell
 
 #first level of a factor be the reference level 
+
+se$dex <- relevel(se$dex, "untrt")
+
+
 
