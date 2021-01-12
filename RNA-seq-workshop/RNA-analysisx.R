@@ -2,6 +2,7 @@ library(GenomicAlignments)
 library(BiocParallel)
 library(GenomicFeatures)
 library(Rsamtools)
+library(reshape2)
 library(DESeq2)
 library(airway)
 library(dplyr)
@@ -95,5 +96,5 @@ nrow(dds)
 
 dds <- dds[ rowSums(counts(dds)) > 1, ]
 
-nrow(dds)
+nrow(dds)  
 
