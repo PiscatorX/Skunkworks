@@ -98,3 +98,23 @@ dds <- dds[ rowSums(counts(dds)) > 1, ]
 
 nrow(dds)  
 
+dds_means <-  data.frame(assay(dds)) %>%
+              mutate(mean_all = rowMeans(.))
+
+(dds_select <- dds_genes[order(-dds_means$mean_all),][seq(1000,nrow(dds_genes),5000),] %>%
+               t() %>% 
+               data.frame())
+
+
+
+head(dds_melt <- melt(dds_select))
+
+
+#log transformed
+ggplot(dds_melt) + geom_boxplot(aes( x = variable, y = log(value)))
+
+
+#raw counts
+ggplot(dds_melt) + geom_boxplot(aes( x = variable, y = value))
+
+
