@@ -82,6 +82,7 @@ round(colSums(assay(se)) / 1e6, 1 )
 
 str(metadata(rowRanges(se)))
 
+#Building Deseq2 object from coldata and count_data
 # count_data <- assay(se)
 # col_data <- colData(se)
 # (ddsMat <- DESeqDataSetFromMatrix(countData = count_data,
@@ -90,4 +91,9 @@ str(metadata(rowRanges(se)))
 
 dds <- DESeqDataSet(se, design = ~ cell + dex)
 
+nrow(dds)
+
+dds <- dds[ rowSums(counts(dds)) > 1, ]
+
+nrow(dds)
 
