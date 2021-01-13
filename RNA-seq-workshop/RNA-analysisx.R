@@ -3,6 +3,7 @@ library(BiocParallel)
 library(GenomicFeatures)
 library(Rsamtools)
 library(reshape2)
+library(ggplot2)
 library(DESeq2)
 library(airway)
 library(dplyr)
@@ -98,6 +99,8 @@ dds <- dds[ rowSums(counts(dds)) > 1, ]
 
 nrow(dds)  
 
+dds_genes <-  assay(dds)
+
 dds_means <-  data.frame(assay(dds)) %>%
               mutate(mean_all = rowMeans(.))
 
@@ -116,5 +119,41 @@ ggplot(dds_melt) + geom_boxplot(aes( x = variable, y = log(value)))
 
 #raw counts
 ggplot(dds_melt) + geom_boxplot(aes( x = variable, y = value))
+
+
+#regularised logarithm of counts 
+rld <- rlog(dds,  blind = FALSE)
+
+par(mfrow = c(1,2))
+
+dds <- estimateSizeFactors(dds)
+
+plot(log2(counts(dds, normalized=TRUE)[,1:2]+1), pch=16, cex=0.3)
+
+
+plot(assay(rld)[,1:2], pch = 16, cex = 0.3)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
