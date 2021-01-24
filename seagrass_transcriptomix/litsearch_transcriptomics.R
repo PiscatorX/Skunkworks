@@ -102,29 +102,41 @@ grouped_terms <-list(
 grouped_terms
 
 
-write_search(
-  grouped_terms,
-  languages="English",
-  exactphrase=TRUE,
-  stemming=TRUE,
-  closure="left",
-  writesearch=TRUE
-)
+# write_search(
+#   grouped_terms,
+#   languages="English",
+#   exactphrase=TRUE,
+#   stemming=TRUE,
+#   closure="left",
+#   writesearch=TRUE
+# )
 
 cat(read_file("search-inEnglish.txt"))
 
 #Used custom query using top "strength term"
 #TITLE-ABS-KEY ( seagrass  OR  "marine plant"  OR  "posidonia oceanica"  OR  "zostera marina"  OR  "cymodocea nodosa"  AND  "transcriptom*"  OR  rna-seq  AND NOT  repeat ) 
-new_results <- import_results(file="DATA/scopus_seagrass_optimised.ris")
+new_results <- import_results(file="DATA/scopus_seagrass_exclusive.ris")
 
 nrow(naive_results)
 nrow(new_results)
 
 naive_results <- naive_results %>%
-                 mutate(in_new_results=title %in% new_results[, "title"]) ->
+                 mutate(in_new_results=title %in% new_results[, "title"]) %>% data.frame()
   
 
 #Check if we missed any of the naive titles
 naive_results %>%
-   filter(!in_new_results) %>%
-   select(title, keywords)
+  filter(!in_new_results) %>%
+  select(title, keywords)
+
+###################################### DATA ANALYSIS #######################################
+
+transcriptome_data <- read.csv("DATA/Seagrass transcriptomics.csv")
+
+shortlist <- transcriptome_data %>%
+              
+
+
+
+
+
