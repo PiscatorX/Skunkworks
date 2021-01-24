@@ -130,9 +130,15 @@ dds <- estimateSizeFactors(dds)
 
 plot(log2(counts(dds, normalized=TRUE)[,1:2]+1), pch=16, cex=0.3)
 
+<<<<<<< HEAD
 plot(assay(rld)[,1:2], pch = 16, cex = 0.3)
 
 sampleDists <- dist(t(assay(rld)))
+=======
+
+plot(assay(rld)[,1:2], pch = 16, cex = 0.3)
+
+>>>>>>> d3e66986fbe7ca81f9709c09277e2054a2a8e747
 
 
 
