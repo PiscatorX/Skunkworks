@@ -114,8 +114,7 @@ write_search(
 cat(read_file("search-inEnglish.txt"))
 
 #Used custom query using top "strength term"
-# (seagrass  OR  "marine plant"  OR  "posidonia oceanica"  OR  "zostera marina"  OR  "cymodocea nodosa" )  AND  ( "transcriptom*"  OR  rna-seq )  NOT  ("simple sequence repeat" ) 
-
+#TITLE-ABS-KEY ( seagrass  OR  "marine plant"  OR  "posidonia oceanica"  OR  "zostera marina"  OR  "cymodocea nodosa"  AND  "transcriptom*"  OR  rna-seq  AND NOT  repeat ) 
 new_results <- import_results(file="DATA/scopus_seagrass_optimised.ris")
 
 nrow(naive_results)
