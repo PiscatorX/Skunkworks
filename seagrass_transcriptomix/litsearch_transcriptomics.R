@@ -131,9 +131,12 @@ naive_results %>%
 
 ###################################### DATA ANALYSIS #######################################
 
-transcriptome_data <- read.csv("DATA/Seagrass transcriptomics.csv")
+transcriptome_data <- read.table("DATA/Seagrass transcritptomics.txt", sep = "\t")
+
+colnames(transcriptome_data)
 
 shortlist <- transcriptome_data %>%
+                         select(tile)
               
 
 
