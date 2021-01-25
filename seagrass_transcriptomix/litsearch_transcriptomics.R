@@ -131,15 +131,17 @@ naive_results %>%
 
 ###################################### DATA ANALYSIS #######################################
 
-transcriptome_data <- read.table("DATA/Seagrass transcritptomics.txt", sep = "\t")
+transcriptome_data <- read.delim("DATA/Transcritptomic.tsv")
 
 colnames(transcriptome_data)
 
-shortlist <- transcriptome_data %>%
-                         select(tile)
-              
+select_studies <-transcriptome_data %>% filter(Seagrass.species != "*")
+
+select_studies %>% group_by(Seagrass.species) %>% summarise(count=n()) %>% arrange(desc(count))
+
+select_studies %>% group_by(RNA.extraction.protocol) %>% summarise(count=n()) %>% arrange(desc(count)) %>% print()
 
 
-
+write.table(select, "protocol_review.tsv", sep = "\t")
 
 
