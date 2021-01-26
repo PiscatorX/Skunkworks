@@ -131,17 +131,26 @@ naive_results %>%
 
 ###################################### DATA ANALYSIS #######################################
 
-transcriptome_data <- read.delim("DATA/Transcritptomic.tsv")
+transcriptome_data <- read.delim2("DATA/Transcritptomic.tsv")
 
 colnames(transcriptome_data)
 
 select_studies <-transcriptome_data %>% filter(Seagrass.species != "*")
 
+#write.table(select, "protocol_review.tsv", sep = "\t")
+
 select_studies %>% group_by(Seagrass.species) %>% summarise(count=n()) %>% arrange(desc(count))
 
-select_studies %>% group_by(RNA.extraction.protocol) %>% summarise(count=n()) %>% arrange(desc(count)) %>% print()
+select_studies %>% group_by(RNA.extraction.protocol) %>% summarise(count=n()) %>% arrange(desc(count)) %>% print(n = Inf)
+
+select_studies %>% 
+      filter(RNA.extraction.protocol == "Aurum™ Total RNA Mini Kit (BIO-RAD, Hercules, CA, USA.)") %>%
+      select(Seagrass.species,Year) %>% 
+      arrange(desc(Year))
+      
+  
+select_studies %>% select(RNA.extraction.protocol,Year,Seagrass.species) %>% arrange(RNA.extraction.protocol) %>% as_tibble() %>% print(n = Inf)
 
 
-write.table(select, "protocol_review.tsv", sep = "\t")
 
 
