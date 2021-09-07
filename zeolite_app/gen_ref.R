@@ -22,3 +22,4 @@ zeo_ref_uniq <- do.call(cbind,   lapply(zeo_ref,   unique)) %>%
 
 write.table(zeo_ref_uniq, "zeolites_DBX.tsv", sep = "\t", quote = F, row.names = FALSE)
 
+
