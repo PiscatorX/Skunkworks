@@ -1,0 +1,1 @@
+Sys.setenv(RETICULATE_PYTHON='~/.virtualenvs/py3k/bin/python3')
