@@ -10,11 +10,11 @@ class FormatZeo(GetZeoliteTsv):
         super().__init__(template)
         self.new_entries = new_entries
         self.rows, self.cols = self.zeolite_df.shape
-        self.zeolite_df = pd.concat([self.zeolite_df, self.new_entries])
         self.set_dtypes()
+        self.zeolite_df = pd.concat([self.zeolite_df, self.new_entries])
         self.encode_categorical()       
 
-    def get_data(self):
+    def get_entry(self):
         
         return self.zeolite_df.iloc[self.rows:,:]
 
@@ -24,6 +24,6 @@ class FormatZeo(GetZeoliteTsv):
         self.save_zeo(outfile)
     
             
-#zeo  = FormatZeo("entry2.tsv","zeolites_DBX.tsv")
-#print(zeo.get_data())
-#zeo.save_entry("entry2cut.tsv")
+# zeo  = FormatZeo( pd.read_csv("1.csv", sep = "\t"))
+# print(zeo.get_entry())
+# zeo.save_entry("Entry.tsv")

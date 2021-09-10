@@ -4,20 +4,26 @@ library(dplyr)
 library(caret)
 library(feather)
 
-reticulate::virtualenv_create("py3k")
-reticulate::virtualenv_install("numpy", "scipy", "sklearn", "pandas",  ignore_installed = T)
+reticulate::virtualenv_create("py3k", python = "python3")
+
+reticulate::virtualenv_install(c('pandas',
+                                 'scikit-learn==0.24.0'),
+                       envname = "py3k",
+                       ignore_installed = TRUE)
+
 reticulate::use_virtualenv("py3k")
-reticulate::py_install("pandas", pip = T)
 reticulate::source_python("reformat_zeo.py")
+reticulate::source_python("random_forest.py")
 
 ui <- fluidPage(
-    titlePanel("Zeolie RF prediction engine"
-      # app title/description
+    titlePanel("Zeolite RF prediction engine"
+      
     ),
     sidebarLayout(
       sidebarPanel(
         fluidRow(
           h3("Adsorbent properties"),
+          
           column(4, selectInput("Adsorbent",
                                 "Adsorbent:",
                                 choices = c('CuAgY', 'CuCeY', 'NiCeY', 'AgY', 'clinoptilolite', 'CeY', 'CuY', 'CuX', 'NiY', 'CsY', 'NaY', 'MCM-22', 'AgCeY', 'AgX', 'CuHY'),
@@ -124,28 +130,43 @@ ui <- fluidPage(
                                 min = 8.0,
                                 max = 3405.0,
                                 value = 0)),
-         
-         column(4, selectInput("solvent", 
-                               "Solvent:", 
+
+         column(4, selectInput("solvent",
+                               "Solvent:",
                                choices = c('cyclohexane', '1-octane', 'n-octane', 'n-heptane', 'iso-octane', 'n-Heptane', 'n-Octane', 'ether', 'hexadecane'),
                                multiple = FALSE)),
-         
+
          column(4, numericInput("oil_adsorbent_ratio",
                                 "Oil adsorbent ratio:",
                                 min = 14.0,
                                 max = 260.0,
                                 value = 0)),
-         
-            
+
+
         ),
         fluidRow(
           column(4, numericInput("Temp",
                                  "Temperature:",
                                  min = 20.0,
                                  max = 80.0,
-                                 value = 0)), 
+                                 value = 0)),
+        ),
+        fluidRow(
+          column(8, fileInput(
+                    "zeolite_file",
+                    "Zeolite file input",
+                    accept = c(
+                      "text/csv",
+                      "text/comma-separated-values,text/plain",
+                      ".csv"),
+                    buttonLabel = "Browse...",
+                    placeholder = "No file selected"
+          )),
+          column(8, downloadButton("downloadExample", label = "Example data")),
+       
 ),
 
+                  
 
 
           
@@ -154,23 +175,46 @@ ui <- fluidPage(
       mainPanel(
         
         tabsetPanel(type = "tabs",
-                    tabPanel("Plots", 
+                    tabPanel("Prediction results",
+                            h3("Random Forests prediction results"),
+                            
+                            fluidRow(
+                              column(3, actionButton("RunRandomForest","Predict adsoption capacity")),
+                              column(3, downloadButton("downloadOutput", label = "Download")),
+                            ),
                              fluidRow(
+                               column(12, plotlyOutput('RF_gauge')),
+                             ),
+                            fluidRow(
+                              column(6, dataTableOutput('zeo_ml_out')),
+                            ),
+                            ),
+                    tabPanel("Plots", 
                                h3("Zeolite reference database PCA"),
-                               selectInput("discrete",
-                                           "Colour categorical variable:",
+                               fluidRow(
+                                 column(3, selectInput("discrete",
+                                           "Colour by:",
                                            choices = c("Adsorbent", "adsorbate", "solvent"),
                                            multiple = FALSE)),
+                                  column(3, textInput("Label", 
+                                                       "Label:", 
+                                                       "MyZeolite"))
+                                 
+                                 ),
                              fluidRow(
-                               column(4, actionButton("LoadZeo1","Load zeolite PCA plot")),
-                               column(4, actionButton("LoadZeo2","Load zeolite PCA 3d plot"))),
+                               column(3, actionButton("LoadZeo1","Load zeolite PCA plot")),
+                               column(3, actionButton("LoadZeo2","Load zeolite PCA 3d plot"))),
                              plotlyOutput('PCAplot1'),
                              plotlyOutput('PCAplot2')
                              
                              ),
                     tabPanel("Data Entered",
-                             dataTableOutput('entry')
-                             )
+                             dataTableOutput('entry'),
+                    ),
+                    tabPanel("About",
+                             br(),
+                             h5('Written by Andrew Ndhlovu and Liberty L. Mguni'),
+                    )
         )
         
       
@@ -203,7 +247,8 @@ server <- function(input, output) {
   }
   
   
-  get_zeo <- reactive({entry <- data.frame(Adsorbent=input$Adsorbent,
+  get_zeo <- reactive({entry <- data.frame(
+                                   Adsorbent=input$Adsorbent,
                                    SA=input$SA,
                                    Vmicro=input$Vmicro,
                                    Vmeso=input$Vmeso,
@@ -241,6 +286,7 @@ server <- function(input, output) {
     numeric_cols  <- zeo_ref %>%
                      select_if(is.numeric) %>%
                      colnames()
+    
     get_entryx <- reactive({
       
       data_in <- get_zeo()
@@ -249,50 +295,147 @@ server <- function(input, output) {
       return(cbind(data_in[c(1:12)], metal_prop ,data_in[c(13:20)]))
     })
     
+
     
-    output$entry <- renderDataTable(get_entryx())
+    
+    get_data <- reactive({
+          
+          zeo_ml <- list() 
+      
+          inFile <- input$zeolite_file
+          
+          if (is.null(inFile)){
+            zeo_ml$zeo_in <- get_entryx()
+            
+          }
+          else{ 
+            data_in <- read.table(inFile$datapath,
+                                    sep = "\t",
+                                    header = T,
+                                  stringsAsFactors = F)
+             zeo_ml$zeo_in <- data_in %>% select(-c(Label))
+             zeo_ml$Label <- data_in$Label   
+          
+          }
+          
+          zeo <- FormatZeo(zeo_ml$zeo_in)
+          zeo_ml$entryx <- zeo$get_entry()
+          
+          stopifnot(ncol(zeolite_encoded) == ncol(zeo_ml$entryx))
+          colnames(zeo_ml$entryx) <- colnames(zeolite_encoded)
+          
+          zeo <- ZeoRandomForest(zeo_ml$entryx)
+          zeo$RF_predict()                    
+          zeo_ml$y_pred <- zeo$RF_predict()
+          
+       
+       return(zeo_ml)
+    })
+    
+
+    
+observeEvent(input$RunRandomForest,{
+  
+    zeom_ml <- get_data()
+    
+    if (is.null(input$zeolite_file)){ 
+      zeom_ml$Label <- input$Label
+    }
+    
+    model_out <- data.frame(Label=zeom_ml$Label, Capacity = zeom_ml$y_pred)
+    
+    
+    output$downloadOutput <- downloadHandler(
+      filename = function() {
+         return("zeolite_ml.tsv")
+      },
+      content = function(file) {
+        write.table(model_out, file, sep = "\t", row.names = FALSE, quote = F)
+      }
+    )
+  
+    
+    
+    
+    
+    output$zeo_ml_out <- renderDataTable({ model_out })
+    
+    output$RF_gauge <- renderPlotly({
+      
+    CAPACITY_MAX =  60.8
+    CAPACITY_MIN =  0.5
+    ypred_mean = mean(zeom_ml$y_pred)
+    
+    gauge_min <- if(ypred_mean < CAPACITY_MIN) ypred_mean else CAPACITY_MIN
+    gauge_max <- if(ypred_mean > CAPACITY_MAX) ypred_mean else CAPACITY_MAX
+    
+    plot_ly(
+        domain = list(x = c(0, 1), y = c(0, 1)),
+        value = ypred_mean,
+        title = list(text = "Predicted Capacity (mg S per g)"),
+        type = "indicator",
+        mode = "gauge+number", width = 500,
+        height = 500)  %>%
+        layout(margin = list(l=gauge_min, r= gauge_max))
+
+})
+   
+})   
+    
+    
+    
 
     pca_data <- reactive({
-      
-            zeo_in <- get_entryx()
-            zeo <- FormatZeo(zeo_in)
-            entryx <- zeo$get_entry()
-            stopifnot(ncol(zeolite_encoded) == ncol(entryx))
-            colnames(entryx) <- colnames(zeolite_encoded)
-            zeolite_encodedx <- rbind(zeolite_encoded, entryx)
+
+            zeo_ml <- get_data()
+            PCA <- list()
+            zeolite_encodedx <- rbind(zeolite_encoded, zeo_ml$entryx)
+            
             Scaler <- preProcess(zeolite_encodedx, method = list(center = numeric_cols, scale = numeric_cols))
             zeolite <- predict(Scaler, zeolite_encodedx)
             zeoDB_pca <- prcomp(zeolite)
-            pca_df <- data.frame(zeoDB_pca$x)
-            label_col <- rbind(zeo_ref[input$discrete], zeo_in[input$discrete])
-
-            pca_df <- cbind(pca_df, label_col)
-            pca_df
+            PCA$data <- data.frame(zeoDB_pca$x, stringsAsFactors = F)
+            
+            color_by <- rbind(zeo_ref[input$discrete], zeo_ml$zeo_in[input$discrete])
+            PCA$data <- cbind(PCA$data, color_by)
+        
+            
+            PCA$n_i <- nrow(zeolite_encoded)
+            PCA$n_j <- nrow(PCA$data)
+            PCA$dada$Label <- character()
+            
+            PCA$data$Label[c((PCA$n_i+1):PCA$n_j)] <- if (is.null(input$zeolite_file)) input$Label else zeo_ml$Label 
+            
+            return(PCA)
 
     })
+
+        
+
     
-   
+       
 observeEvent(input$LoadZeo1,{
      
 output$PCAplot1 <- renderPlotly({
 
-            nx <- nrow(zeolite_encoded)
-            pca_df <- pca_data() 
+            PCA <- pca_data()
             
-            ggplotly(ggplot(data = pca_df[c(1:nx),], aes_string(x = "PC1" , y = "PC2", color = input$discrete )) +
+            ggplotly(ggplot(data = PCA$data[c(1:PCA$n_i),], aes_string(x = "PC1" , y = "PC2", color = input$discrete )) +
                     xlab(label = "PC1") +
                     ylab(label = "PC2") +
                     geom_point(size = 1) +
-                    geom_point(data= filter(pca_df, row_number() > nx), aes_string(x = "PC1" , y = "PC2", color = input$discrete), size = 2, shape = 23) +
+                    geom_point(data= filter(PCA$data, row_number() > PCA$n_i), aes_string(x = "PC1" , y = "PC2", color = input$discrete), size = 1.75, shape = 23) +
+                    geom_text(data= filter(PCA$data, row_number() > PCA$n_i), aes(label = Label, colour = "black"), nudge_y = 0.25) +
                     theme(panel.grid.minor = element_blank(),
                           panel.background = element_blank(),
                           legend.key = element_rect(fill = "white"),
                           legend.position="top",
                           axis.text = element_text(size=18, colour = "black"),
                           axis.title = element_text(size=18, colour = "black"),
-                          panel.border = element_rect(colour = "black", fill=NA))) %>%
-                            layout(legend = list(orientation = "h", x = 0.4, y = -0.2), width = 750,
-                                   height = 750)})
+                          panel.border = element_rect(colour = "black", fill=NA)), 
+                    width = 750,
+                    height = 750) %>%
+                            layout(legend = list(orientation = "h", x = 0.4, y = -0.2))})
 
 })    
 
@@ -301,13 +444,13 @@ observeEvent(input$LoadZeo2,{
   
   color_tag <- unlist(pca_data()[input$discrete])
   
-  output$PCAplot1 <-  renderPlotly(plot_ly(data = pca_data(), 
+  output$PCAplot1 <-  renderPlotly(plot_ly(data = pca_data()$data, 
                                             x = ~PC1, 
                                             y = ~PC2, 
                                             z = ~PC3, 
-                                            color = ~unlist(pca_data()[input$discrete]), width = 750,
+                                            color = ~unlist(pca_data()$data[input$discrete]), width = 750,
                                            height = 750)  %>%
-                                      add_markers(size = 12))     
+                                      add_markers(size = 5))     
                       
 })
 
@@ -322,6 +465,40 @@ get_prop <- function(adsorbent){
              select(-c(Adsorbent)))
   
 }
+
+
+output$entry <- renderDataTable({
+
+      inFile <- input$zeolite_file
+      
+      if (is.null(inFile)){
+        
+        return(get_zeo())
+        
+      }
+      else{
+        
+        return(read.table(inFile$datapath,
+                 sep = "\t",
+                 header = T))
+      }
+
+
+})
+
+
+
+output$downloadExample <- downloadHandler(
+  filename = function() {
+    return("zeo_sample.tsv")
+  },
+  content = function(file) {
+    file.copy("zeo_sample.tsv", file)
+  }
+)
+
+
+
 
 
 

@@ -20,6 +20,6 @@ for (col in numeric_cols){
 zeo_ref_uniq <- do.call(cbind,   lapply(zeo_ref,   unique)) %>% 
                 data.frame()
 
-write.table(zeo_ref_uniq, "zeolites_DBX.tsv", sep = "\t", quote = F, row.names = FALSE)
+write.table(zeo_ref_uniq, "zeolite_template.tsv", sep = "\t", quote = F, row.names = FALSE)
 
 
