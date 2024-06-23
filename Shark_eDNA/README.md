@@ -2,7 +2,7 @@
 
 ## Read QC
 
-First we assess the quality of our reads, this can also be done under DADA2 but fastqc/multiqc has visuals. These results can be used to inform the downstreem filtering and trimming of reads. We set a few variables to simplify the pipeline outputs and load the necessary modules.
+First we assess the quality of our reads, this can also be done under DADA2 but fastqc/multiqc visuals are superior. These results can be used to inform the downstreem filtering and trimming of reads. We set a few variables to simplify the pipeline outputs and load the necessary modules.
 
 ```
 rawread_dir="/new-home/andhlovu/Shark_eDNA/RawReads"
@@ -29,5 +29,19 @@ multiqc \
 
 
 Divisive Amplicon Denoising Algorithm v2 (DADA) was provided to correct amplicon sequencing errors generating amplicon sequence variants (ASV) which have been established to more powereful (better error handling resulting in better measures of microbial diversity) than conventionl OTUs clusteres at 97\%.
+
+### R/DADA2 Installation on the cluster
+
+DADA2 is an R package and to run it on the cluster we have to set it up propally. It also important to point out that DADA2 is implemented as part of the [Qiime2 pipeline](https://docs.qiime2.org/2024.5/plugins/available/dada2/denoise-paired/). However, we are going to run DADA2 directly throug R.
+
+To get R to run on the cluster we have to set up a few items. First we need to load the R module.
+
+```
+module load app/R/R-4.0.2
+
+```
+
+Please take note of the version number, the two other versions of R at the time of writing this would not load due to errors.
+
 
 
