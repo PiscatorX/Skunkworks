@@ -3,6 +3,7 @@
 ## Read QC
 
 First we assess the quality of our reads, this informs the downstreem filtering and trimming of reads.
+We set a few variables to simplify the pipeline.
 
 ```
 rawread_dir="/new-home/andhlovu/Shark_eDNA/RawReads"
