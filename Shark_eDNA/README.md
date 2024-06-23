@@ -28,6 +28,6 @@ multiqc \
 ## [DADA2](https://bioconductor.org/packages/release/bioc/html/dada2.html) workflow
 
 
-Divisive Amplicon Denoising Algorithm v2 (DADA) was provided to correct amplicon sequencing errors generating Amplicon sequence variants (ASV) where seen to be more powerful than  conventionl OTUs clusteres at 97\%.
+Divisive Amplicon Denoising Algorithm v2 (DADA) was provided to correct amplicon sequencing errors generating amplicon sequence variants (ASV) which have been established to more powereful (better error handling resulting in better measures of microbial diversity) than conventionl OTUs clusteres at 97\%.
 
 
