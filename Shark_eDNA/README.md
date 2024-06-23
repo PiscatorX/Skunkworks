@@ -37,11 +37,11 @@ DADA2 is an R package and to run it on the cluster we have to set it up propally
 To get R to run on the cluster we have to set up a few items. First we request to request to used the cluster interaactiveley by issuing the command ```qsubi``` command. More on that and related HPC2 commands [here]. To use the R console, we can load the R module.
 
 ```
-module load app/R/R-4.0.2
+module load  app/R/4.3.2
 
 ```
 
-Please take note of the version number, the two other versions of R at the time of writing this would not load due to errors.
+I have noticed that sometimes this will generate an error 
 We also need to tell R to insall packages in the local directory as we don't have permission to write to main R libraries. We run the following command on thcommand line.
 
 ```
@@ -49,7 +49,10 @@ export R_LIBS_USER=$HOME/apps/R:$R_LIBS_USER
 
 ```
 
-We can now start the R console by using ``` R ``` command. Once we are in in the R console were can run our install our packages that we need. We can not run R using the console, for example, we can test if dada2 has been installed by running ``` library(dada2) ```
+We can now start the R console by using ``` R ``` command. Once we are on the R console were can run our install our packages that we need. We can not run R using the console, for example, we can test if dada2 has been installed by running ``` library(dada2) ```
+
+DADA2 documentation is available from [biconductor](https://bioconductor.org/packages/release/bioc/vignettes/dada2/inst/doc/dada2-intro.html)  and there is also a recommended [tutorial](https://benjjneb.github.io/dada2/tutorial.html) and  
+
 
 
 
