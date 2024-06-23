@@ -34,7 +34,7 @@ Divisive Amplicon Denoising Algorithm v2 (DADA) was provided to correct amplicon
 
 DADA2 is an R package and to run it on the cluster we have to set it up propally. It also important to point out that DADA2 is implemented as part of the [Qiime2 pipeline](https://docs.qiime2.org/2024.5/plugins/available/dada2/denoise-paired/). However, we are going to run DADA2 directly throug R.
 
-To get R to run on the cluster we have to set up a few items. First we need to load the R module.
+To get R to run on the cluster we have to set up a few items. First we request to request to used the cluster interaactiveley by issuing the command ```qsubi``` command. More on that and related HPC2 commands [here]. To use the R console, we can load the R module.
 
 ```
 module load app/R/R-4.0.2
@@ -49,5 +49,8 @@ export R_LIBS_USER=$HOME/apps/R:$R_LIBS_USER
 
 ```
 
-We can now start the R console by using ``` R ``` command. Once we are in in the R console were can run our install our packages that we need. We can test ifthe packages we need are installed by running ``` > library(dada2) ```
+We can now start the R console by using ``` R ``` command. Once we are in in the R console were can run our install our packages that we need. We can not run R using the console, for example, we can test if dada2 has been installed by running ``` library(dada2) ```
+
+
+
 
