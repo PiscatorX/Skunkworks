@@ -42,6 +42,12 @@ module load app/R/R-4.0.2
 ```
 
 Please take note of the version number, the two other versions of R at the time of writing this would not load due to errors.
+We also need to tell R to insall packages in the local directory as we don't have permission to write to main R libraries. We run the following command on thcommand line.
 
+```
+export R_LIBS_USER=$HOME/apps/R:$R_LIBS_USER
 
+```
+
+We can now start the R console by using ``` R ``` command. Once we are in in the R console were can run our install our packages that we need. We can test ifthe packages we need are installed by running ``` > library(dada2) ```
 
