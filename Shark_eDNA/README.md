@@ -34,7 +34,7 @@ Divisive Amplicon Denoising Algorithm v2 (DADA) was provided to correct amplicon
 
 DADA2 is an R package and to run it on the cluster we have to set it up properly. It also important to point out that DADA2 is implemented as part of the [Qiime2 pipeline](https://docs.qiime2.org/2024.5/plugins/available/dada2/denoise-paired/). However, we are going to run DADA2 directly through R.
 
-To get R to run on the cluster we have to set up a few items. First we request to request to used the cluster interactively by issuing the command ```qsubi``` command. More on that and related HP2 commands [here]. To use the R console, we can load the R module.
+To get R to run on the cluster we have to set up a few items. First we request to request to used the cluster interactively by issuing the command ```qsubi``` command. More on that and related HP2 commands [here](https://www0.sun.ac.za/hpc/index.php?title=HOWTO_submit_jobs). To use the R console, we can load the R module.
 
 ```
 module load  app/R/4.3.2
@@ -51,7 +51,28 @@ export R_LIBS_USER=$HOME/apps/R:$R_LIBS_USER
 
 We can now start the R console by using ``` R ``` command. Once we are on the R console were can run our install our packages that we need. We can not run R using the console, for example, we can test if dada2 has been installed by running ``` library(dada2) ```
 
-DADA2 documentation is available from [biconductor](https://bioconductor.org/packages/release/bioc/vignettes/dada2/inst/doc/dada2-intro.html)  and there is also a recommended [tutorial](https://benjjneb.github.io/dada2/tutorial.html) and  
+DADA2 documentation is available from [biconductor](https://bioconductor.org/packages/release/bioc/vignettes/dada2/inst/doc/dada2-intro.html)  and there is also a recommended [tutorial](https://benjjneb.github.io/dada2/tutorial.html).
+
+A Jupyter notebook  is provided showing dada workflow up to ASV and taxa table. To run the pipeline on the commandline on the cluster we invoke inside a script where we request resources using ```#PBS``` directives including the modules required. DADA2 autodects the available number of cores/cpus on the clusters and takes advantage of these resources to complete the analysis fast. We use the ```Rscript ``` to interpret and run the R script, this can also be achieved using ```R CMD batch``` see the discussion on the differences between using these two [here](https://stackoverflow.com/questions/21969145/why-or-when-is-rscript-or-littler-better-than-r-cmd-batch)
+
+```
+#!/bin/bash
+#PBS -N DADA2-workflow
+#PBS -l select=1:ncpus=24
+#PBS -l walltime=48:00:00
+
+module load  app/R/4.3.2
+
+#ensures that output files go to the working directory of the script
+
+cd $PBS_O_WORKDIR
+
+Rscript DADA2_workflow.R
+```
+
+
+
+
 
 
 
