@@ -53,7 +53,7 @@ We can now start the R console by using ``` R ``` command. Once we are on the R 
 
 DADA2 documentation is available from [biconductor](https://bioconductor.org/packages/release/bioc/vignettes/dada2/inst/doc/dada2-intro.html)  and there is also a recommended [tutorial](https://benjjneb.github.io/dada2/tutorial.html).
 
-A Jupyter notebook  is provided showing dada workflow up to ASV and taxa table. To run the pipeline on the commandline on the cluster we invoke inside a script where we request resources using ```#PBS``` directives including the modules required. DADA2 autodects the available number of cores/cpus on the clusters and takes advantage of these resources to complete the analysis fast. We use the ```Rscript ``` to interpret and run the R script, this can also be achieved using ```R CMD batch``` see the discussion on the differences between using these two [here](https://stackoverflow.com/questions/21969145/why-or-when-is-rscript-or-littler-better-than-r-cmd-batch)
+A Jupyter notebook  is provided showing dada workflow up to ASV and taxa table. To run the pipeline on the command line on the cluster we invoke inside a script where we request resources using ```#PBS``` directives including the modules required. DADA2 auto detects the available number of cores/cpus on the clusters and takes advantage of these resources to complete the analysis fast. We use the ```Rscript ``` to interpret and run the R script, this can also be achieved using ```R CMD batch``` see the discussion on the differences between using these two [here](https://stackoverflow.com/questions/21969145/why-or-when-is-rscript-or-littler-better-than-r-cmd-batch)
 
 ```
 #!/bin/bash
