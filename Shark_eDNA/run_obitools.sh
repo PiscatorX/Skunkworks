@@ -2,56 +2,40 @@
 
 set -eu
 
+#set you the directory of your reads here
 read_dir="/home/drewx/DevOps/raw_reads"
+#This file will contain paired the filenames and sample ids 
 manifest="manifest.tsv"
+#This is where your outputs will go this
 output="/home/drewx/devs/Shark_eDNA"
 
-#Obitools database
-#obitools3=/home/drewx/DevOps/obitools3
-
-#https://github.com/PiscatorX/blue-carbon-microbiomes/blob/main/scripts/qiime_buildmanifest.py
-#Use python script to generate paired data file manifest
-#This creates a temporary file with headers
+#use python script to generate paired data file manifest
+#https://github.com/piscatorx/blue-carbon-microbiomes/blob/main/scripts/qiime_buildmanifest.py
+#this creates a temporary file with headers
 qiime_buildmanifest.py \
     -r "${read_dir}" \
     -m  /tmp/manifest.tmp
 
-
-#This removes the headers in the temporary file 
+#this removes the headers in the temporary file 
 awk "NR!=1 {print}" /tmp/manifest.tmp  > "${manifest}"
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 mkdir -p "${output}/merged"
 
 while read sample_id fwd rev
 do
-    #obi import --fastq-input  ${fwd}  obitools3/${sample_id}_1
-    #obi import --fastq-input  ${rev}  obitools3/${sample_id}_2
-    #obi alignpairedend -R obitools3/${sample_id}_2 obitools3/${sample_id}_1 obitools3/merged_${sample_id}
-    obi export --fastq-output obitools3/aligned_${sample_id} > "${output}/merged/${sample_id}.fastq" 
+    obi import --fastq-input  ${fwd}  obitools3/${sample_id}_1
+    obi annotate -S sample:\'${sample_id}\' obitools3/${sample_id}_1  obitools3/${sample_id}_tag1  
+    obi import --fastq-input  ${rev}  obitools3/${sample_id}_2
+    obi annotate -S sample:\'${sample_id}\' obitools3/${sample_id}_2  obitools3/${sample_id}_tag2  
+    obi alignpairedend -R obitools3/${sample_id}_2 obitools3/${sample_id}_1 obitools3/raw_merged_${sample_id}
+    obi grep -p "sequence['score_norm'] > 0.8" obitools3/raw_merged_${sample_id} obitools3/filtered_merged_${sample_id}
+    obi export --fastq-output obitools3/filtered_merged_${sample_id} > "${output}/merged/${sample_id}.fastq"
     break
 
 done <  ${manifest}
 
 # mkdir -p "${output}/fastqc"
 # mkdir -p "${output}/multiqc"
-
-
-
-
-
 #while read fwd rev
 #obi import --fasta {input[0]} {params[0]}/demultiplexed
 
