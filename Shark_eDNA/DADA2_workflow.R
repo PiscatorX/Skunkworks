@@ -49,7 +49,7 @@ data.frame(fnFs, filtFs, fnRs, filtRs)
 #This writes out the filenames created above to disk
 out <- filterAndTrim(fnFs, filtFs, fnRs, filtRs, truncLen=c(0,0),
               maxN=0, maxEE=c(2,5), truncQ=2, rm.phix=TRUE,
-              compress=TRUE, multithread=FALSE) # On Windows set multithread=FALSE
+              compress=TRUE, multithread=TRUE) # On Windows set multithread=FALSE
 
 str(out)
 
